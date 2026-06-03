@@ -1,30 +1,92 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+import 'dart:async';
 
+import 'package:dailysky/data/models/forecast_bundle.dart';
+import 'package:dailysky/data/repositories/weather_repository.dart';
+import 'package:dailysky/presentation/home/home_screen.dart';
+import 'package:dailysky/presentation/home/home_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:provider/provider.dart';
 
-import 'package:dailysky/main.dart';
+class _FakeRepository implements WeatherRepository {
+  _FakeRepository(this._completer);
+  final Completer<ForecastBundle> _completer;
+
+  @override
+  Future<ForecastBundle> loadForCurrentLocation() => _completer.future;
+
+  @override
+  Future<ForecastBundle> loadForCity(String city) => _completer.future;
+}
+
+ForecastBundle _sampleBundle() {
+  int dt(int y, int mo, int d, int h) =>
+      DateTime.utc(y, mo, d, h).millisecondsSinceEpoch ~/ 1000;
+  Map<String, dynamic> slot(int t) => {
+    'dt': t,
+    'main': {
+      'temp': 20.0,
+      'feels_like': 19.0,
+      'temp_min': 18.0,
+      'temp_max': 22.0,
+      'humidity': 55,
+    },
+    'wind': {'speed': 3.0, 'deg': 200},
+    'pop': 0.1,
+    'weather': [
+      {'id': 800, 'main': 'Clear', 'description': 'ciel dégagé', 'icon': '01d'},
+    ],
+  };
+  return ForecastBundle.fromApi(
+    forecast: {
+      'city': {
+        'name': 'Lyon',
+        'coord': {'lat': 45.75, 'lon': 4.85},
+        'timezone': 7200,
+      },
+      'list': [slot(dt(2024, 6, 3, 12)), slot(dt(2024, 6, 4, 12))],
+    },
+    source: ForecastSource.gps,
+  );
+}
+
+Widget _wrap(WeatherRepository repo) => ChangeNotifierProvider<HomeViewModel>(
+  create: (_) => HomeViewModel(repo)..load(),
+  child: const MaterialApp(
+    locale: Locale('fr'),
+    supportedLocales: [Locale('fr')],
+    localizationsDelegates: [
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate,
+    ],
+    home: HomeScreen(),
+  ),
+);
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  setUpAll(() => initializeDateFormatting('fr_FR'));
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  testWidgets('affiche l\'indicateur de chargement au démarrage', (
+    tester,
+  ) async {
+    // Future jamais complétée -> reste en chargement.
+    await tester.pumpWidget(
+      _wrap(_FakeRepository(Completer<ForecastBundle>())),
+    );
     await tester.pump();
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+  });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  testWidgets('affiche les prévisions une fois chargées', (tester) async {
+    final completer = Completer<ForecastBundle>();
+    await tester.pumpWidget(_wrap(_FakeRepository(completer)));
+    completer.complete(_sampleBundle());
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Prévisions sur'), findsOneWidget);
+    expect(find.text('Lyon'), findsWidgets);
   });
 }

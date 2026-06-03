@@ -1,6 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Accès réseau requis pour l'API météo (présent ici pour que les builds release fonctionnent). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Géolocalisation pour obtenir la météo de la position de l'utilisateur. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <application
-        android:label="dailysky"
+        android:label="DailySky"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
