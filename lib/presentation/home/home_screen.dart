@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/theme/weather_palette.dart';
@@ -113,10 +114,7 @@ class _SuccessView extends StatelessWidget {
                     onMyLocation: onMyLocation,
                   ),
                   if (bundle.source == ForecastSource.defaultCity)
-                    const _InfoBanner(
-                      icon: Icons.location_off_rounded,
-                      text: 'Localisation indisponible — ville par défaut.',
-                    ),
+                    _buildGpsBanner(context, bundle),
                   if (bundle.isStale)
                     const _InfoBanner(
                       icon: Icons.cloud_off_rounded,
@@ -153,16 +151,70 @@ class _SuccessView extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildGpsBanner(BuildContext context, ForecastBundle bundle) {
+    final gpsError = bundle.gpsError;
+    if (gpsError == null) {
+      return const _InfoBanner(
+        icon: Icons.location_off_rounded,
+        text: 'Localisation indisponible — ville par défaut.',
+      );
+    }
+
+    const accent = Color(0xFFFFB74D); // Orange chaleureux
+    switch (gpsError) {
+      case GpsErrorType.serviceDisabled:
+        return _InfoBanner(
+          icon: Icons.gps_off_rounded,
+          text: 'Le GPS de votre appareil est désactivé. Activez-le pour obtenir la météo locale.',
+          accentColor: accent,
+          actionLabel: 'Activer',
+          onAction: () async {
+            await Geolocator.openLocationSettings();
+          },
+        );
+      case GpsErrorType.permissionDenied:
+        return _InfoBanner(
+          icon: Icons.location_off_rounded,
+          text: "L'accès à la position a été refusé. Autorisez-le pour afficher la météo locale.",
+          accentColor: accent,
+          actionLabel: 'Autoriser',
+          onAction: onMyLocation,
+        );
+      case GpsErrorType.permissionDeniedForever:
+        return _InfoBanner(
+          icon: Icons.gpp_bad_rounded,
+          text: "L'accès à la position est bloqué. Activez-le dans les paramètres.",
+          accentColor: accent,
+          actionLabel: 'Paramètres',
+          onAction: () async {
+            await Geolocator.openAppSettings();
+          },
+        );
+    }
+  }
 }
 
 class _InfoBanner extends StatelessWidget {
-  const _InfoBanner({required this.icon, required this.text});
+  const _InfoBanner({
+    required this.icon,
+    required this.text,
+    this.actionLabel,
+    this.onAction,
+    this.accentColor,
+  });
 
   final IconData icon;
   final String text;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
+    final borderCol = accentColor?.withValues(alpha: 0.4) ?? Colors.white.withValues(alpha: 0.22);
+    final iconCol = accentColor ?? Colors.white;
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
       child: Container(
@@ -170,11 +222,11 @@ class _InfoBanner extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+          border: Border.all(color: borderCol),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 18, color: Colors.white),
+            Icon(icon, size: 20, color: iconCol),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -182,6 +234,27 @@ class _InfoBanner extends StatelessWidget {
                 style: const TextStyle(color: Colors.white, fontSize: 13),
               ),
             ),
+            if (actionLabel != null && onAction != null) ...[
+              const SizedBox(width: 10),
+              TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: accentColor?.withValues(alpha: 0.15) ?? Colors.white.withValues(alpha: 0.1),
+                  foregroundColor: accentColor ?? Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  side: BorderSide(color: accentColor?.withValues(alpha: 0.3) ?? Colors.white.withValues(alpha: 0.2)),
+                  ),
+                ),
+                onPressed: onAction,
+                child: Text(
+                  actionLabel!,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                ),
+              ),
+            ],
           ],
         ),
       ),

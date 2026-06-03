@@ -6,6 +6,13 @@ import 'forecast_entry.dart';
 /// Origine des données affichées (sert à informer l'utilisateur).
 enum ForecastSource { gps, defaultCity, search }
 
+/// Type d'erreur GPS pour afficher une bannière explicative.
+enum GpsErrorType {
+  serviceDisabled,
+  permissionDenied,
+  permissionDeniedForever,
+}
+
 /// Données météo complètes prêtes pour l'affichage : météo actuelle (en-tête)
 /// + prévisions journalières (liste).
 class ForecastBundle {
@@ -19,6 +26,7 @@ class ForecastBundle {
     required this.source,
     required this.fetchedAt,
     this.isStale = false,
+    this.gpsError,
   });
 
   final String cityName;
@@ -35,7 +43,14 @@ class ForecastBundle {
   /// Vrai si servi depuis un cache périmé (repli après échec réseau).
   final bool isStale;
 
-  ForecastBundle copyWith({ForecastSource? source, bool? isStale}) =>
+  /// Type d'erreur GPS si la géolocalisation a échoué.
+  final GpsErrorType? gpsError;
+
+  ForecastBundle copyWith({
+    ForecastSource? source,
+    bool? isStale,
+    GpsErrorType? gpsError,
+  }) =>
       ForecastBundle(
         cityName: cityName,
         latitude: latitude,
@@ -46,6 +61,7 @@ class ForecastBundle {
         source: source ?? this.source,
         fetchedAt: fetchedAt,
         isStale: isStale ?? this.isStale,
+        gpsError: gpsError ?? this.gpsError,
       );
 
   /// Construit le bundle à partir des réponses brutes de l'API et regroupe les
@@ -57,6 +73,7 @@ class ForecastBundle {
     required ForecastSource source,
     DateTime? fetchedAt,
     bool isStale = false,
+    GpsErrorType? gpsError,
   }) {
     final city = forecast['city'] as Map<String, dynamic>? ?? const {};
     final coord = city['coord'] as Map<String, dynamic>? ?? const {};
@@ -85,6 +102,7 @@ class ForecastBundle {
       source: source,
       fetchedAt: fetchedAt ?? DateTime.now(),
       isStale: isStale,
+      gpsError: gpsError,
     );
   }
 

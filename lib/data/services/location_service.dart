@@ -9,27 +9,39 @@ class Coords {
   final double longitude;
 }
 
+class LocationServiceDisabledException implements Exception {
+  const LocationServiceDisabledException();
+}
+
+class LocationPermissionDeniedException implements Exception {
+  const LocationPermissionDeniedException();
+}
+
+class LocationPermissionDeniedForeverException implements Exception {
+  const LocationPermissionDeniedForeverException();
+}
+
 /// Accès à la position de l'appareil via `geolocator`.
-///
-/// Ne lève jamais d'exception : renvoie `null` si la localisation est
-/// désactivée, refusée, indisponible ou expirée. Le repository bascule alors
-/// proprement sur la ville par défaut (aucun crash).
 class LocationService {
   const LocationService();
 
   Future<Coords?> getCurrentCoords() async {
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      throw const LocationServiceDisabledException();
+    }
+
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    if (permission == LocationPermission.denied) {
+      throw const LocationPermissionDeniedException();
+    }
+    if (permission == LocationPermission.deniedForever) {
+      throw const LocationPermissionDeniedForeverException();
+    }
+
     try {
-      if (!await Geolocator.isLocationServiceEnabled()) return null;
-
-      var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        return null;
-      }
-
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.medium,

@@ -32,21 +32,33 @@ class WeatherRepositoryImpl implements WeatherRepository {
 
   @override
   Future<ForecastBundle> loadForCurrentLocation() async {
-    final coords = await _location.getCurrentCoords();
-    if (coords != null) {
-      return _load(
-        cacheKey: _coordsKey(coords.latitude, coords.longitude),
-        source: ForecastSource.gps,
-        fetch: () =>
-            _api.fetchByCoords(lat: coords.latitude, lon: coords.longitude),
-      );
+    try {
+      final coords = await _location.getCurrentCoords();
+      if (coords != null) {
+        return _load(
+          cacheKey: _coordsKey(coords.latitude, coords.longitude),
+          source: ForecastSource.gps,
+          fetch: () =>
+              _api.fetchByCoords(lat: coords.latitude, lon: coords.longitude),
+        );
+      }
+      return _loadFallback(null);
+    } on LocationServiceDisabledException {
+      return _loadFallback(GpsErrorType.serviceDisabled);
+    } on LocationPermissionDeniedException {
+      return _loadFallback(GpsErrorType.permissionDenied);
+    } on LocationPermissionDeniedForeverException {
+      return _loadFallback(GpsErrorType.permissionDeniedForever);
     }
-    // Pas de position disponible : on bascule sur la ville par défaut.
-    return _load(
+  }
+
+  Future<ForecastBundle> _loadFallback(GpsErrorType? gpsError) async {
+    final bundle = await _load(
       cacheKey: _cityKey(AppConfig.fallbackCity),
       source: ForecastSource.defaultCity,
       fetch: () => _api.fetchByCity(AppConfig.fallbackCity),
     );
+    return bundle.copyWith(gpsError: gpsError);
   }
 
   @override
