@@ -5,6 +5,7 @@ import '../../../core/utils/weather_format.dart';
 import '../../../core/utils/weather_icon_mapper.dart';
 import '../../../core/weather/weather_kind.dart';
 import '../../../data/models/forecast_bundle.dart';
+import '../../weather_effects/weather_effects_layer.dart';
 
 /// En-tête « héros » : dégradé dont les couleurs dépendent de la météo
 /// (et du jour/nuit), avec la ville, la température et un récapitulatif.
@@ -40,11 +41,6 @@ class WeatherHeroHeader extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: palette.gradient,
-        ),
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
@@ -54,85 +50,118 @@ class WeatherHeroHeader extends StatelessWidget {
           ),
         ],
       ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 16, 12, 22),
-        child: Column(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: Stack(
           children: [
-            Row(
-              children: [
-                const Icon(Icons.location_on, color: Colors.white, size: 20),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    city,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
+            // Dégradé d'origine (design inchangé).
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: palette.gradient,
                   ),
                 ),
-                IconButton(
-                  onPressed: onMyLocation,
-                  icon: const Icon(Icons.my_location_rounded),
-                  color: Colors.white,
-                  tooltip: 'Utiliser ma position',
-                ),
-                IconButton(
-                  onPressed: onSearch,
-                  icon: const Icon(Icons.search_rounded),
-                  color: Colors.white,
-                  tooltip: 'Rechercher une ville',
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Icon(weatherIcon(kind, isNight: isNight),
-                size: 92, color: Colors.white),
-            const SizedBox(height: 8),
-            Text(
-              temp != null ? WeatherFormat.temp(temp) : '—',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 68,
-                fontWeight: FontWeight.w300,
-                height: 1,
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              condition?.label ?? '',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.92),
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
+            // Effets météo animés, derrière le contenu.
+            Positioned.fill(
+              child: WeatherEffectsLayer(kind: kind, isNight: isNight),
             ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                _HeroStat(
-                  icon: Icons.thermostat_rounded,
-                  label: 'Ressenti',
-                  value: feelsLike != null ? WeatherFormat.temp(feelsLike) : '—',
-                ),
-                _divider,
-                _HeroStat(
-                  icon: Icons.water_drop_rounded,
-                  label: 'Humidité',
-                  value:
-                      humidity != null ? WeatherFormat.humidity(humidity) : '—',
-                ),
-                _divider,
-                _HeroStat(
-                  icon: Icons.air_rounded,
-                  label: 'Vent',
-                  value: wind != null ? WeatherFormat.wind(wind) : '—',
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 12, 22),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          city,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: onMyLocation,
+                        icon: const Icon(Icons.my_location_rounded),
+                        color: Colors.white,
+                        tooltip: 'Utiliser ma position',
+                      ),
+                      IconButton(
+                        onPressed: onSearch,
+                        icon: const Icon(Icons.search_rounded),
+                        color: Colors.white,
+                        tooltip: 'Rechercher une ville',
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Icon(
+                    weatherIcon(kind, isNight: isNight),
+                    size: 92,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    temp != null ? WeatherFormat.temp(temp) : '—',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 68,
+                      fontWeight: FontWeight.w300,
+                      height: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    condition?.label ?? '',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.92),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      _HeroStat(
+                        icon: Icons.thermostat_rounded,
+                        label: 'Ressenti',
+                        value: feelsLike != null
+                            ? WeatherFormat.temp(feelsLike)
+                            : '—',
+                      ),
+                      _divider,
+                      _HeroStat(
+                        icon: Icons.water_drop_rounded,
+                        label: 'Humidité',
+                        value: humidity != null
+                            ? WeatherFormat.humidity(humidity)
+                            : '—',
+                      ),
+                      _divider,
+                      _HeroStat(
+                        icon: Icons.air_rounded,
+                        label: 'Vent',
+                        value: wind != null ? WeatherFormat.wind(wind) : '—',
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),

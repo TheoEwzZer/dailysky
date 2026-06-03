@@ -33,24 +33,27 @@ class HomeScreen extends StatelessWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) return;
         viewModel.consumeTransientError();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(transientError)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(transientError)));
       });
     }
 
     return Scaffold(
       body: switch (viewModel.state) {
-        LoadingState() =>
-          const AppLoadingView(message: 'Chargement de la météo…'),
-        FailureState(:final message) =>
-          AppErrorView(message: message, onRetry: viewModel.retry),
+        LoadingState() => const AppLoadingView(
+          message: 'Chargement de la météo…',
+        ),
+        FailureState(:final message) => AppErrorView(
+          message: message,
+          onRetry: viewModel.retry,
+        ),
         SuccessState(:final data) => _SuccessView(
-            bundle: data,
-            onRefresh: viewModel.refresh,
-            onSearch: () => _openSearch(context),
-            onMyLocation: viewModel.load,
-          ),
+          bundle: data,
+          onRefresh: viewModel.refresh,
+          onSearch: () => _openSearch(context),
+          onMyLocation: viewModel.load,
+        ),
       },
     );
   }
@@ -87,7 +90,8 @@ class _SuccessView extends StatelessWidget {
             if (bundle.source == ForecastSource.defaultCity)
               _InfoBanner(
                 icon: Icons.location_off_rounded,
-                text: 'Localisation indisponible — météo de la ville par '
+                text:
+                    'Localisation indisponible — météo de la ville par '
                     'défaut (${bundle.cityName}).',
               ),
             if (bundle.isStale)
@@ -99,22 +103,20 @@ class _SuccessView extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
               child: Text(
                 'Prévisions sur ${bundle.daily.length} jours',
-                style: theme.textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w700),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
-            for (var i = 0; i < bundle.daily.length; i++)
-              DailyForecastTile(
-                day: bundle.daily[i],
-                heroTag: 'forecast-day-$i',
-                cityName: bundle.cityName,
-              ),
+            for (final day in bundle.daily)
+              DailyForecastTile(day: day, cityName: bundle.cityName),
             const SizedBox(height: 10),
             Center(
               child: Text(
                 'Données fournies par OpenWeatherMap',
-                style: theme.textTheme.bodySmall
-                    ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
             ),
           ],
@@ -148,8 +150,9 @@ class _InfoBanner extends StatelessWidget {
             Expanded(
               child: Text(
                 text,
-                style: theme.textTheme.bodySmall
-                    ?.copyWith(color: theme.colorScheme.onSecondaryContainer),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSecondaryContainer,
+                ),
               ),
             ),
           ],

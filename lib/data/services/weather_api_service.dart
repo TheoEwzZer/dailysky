@@ -20,8 +20,8 @@ class RawWeather {
 /// effectue les requêtes, applique un timeout et lève des exceptions typées.
 class WeatherApiService {
   WeatherApiService({http.Client? client, String? apiKey})
-      : _client = client ?? http.Client(),
-        _apiKey = apiKey ?? AppConfig.openWeatherApiKey;
+    : _client = client ?? http.Client(),
+      _apiKey = apiKey ?? AppConfig.openWeatherApiKey;
 
   final http.Client _client;
   final String _apiKey;
@@ -29,8 +29,7 @@ class WeatherApiService {
   Future<RawWeather> fetchByCoords({
     required double lat,
     required double lon,
-  }) =>
-      _fetch({'lat': '$lat', 'lon': '$lon'});
+  }) => _fetch({'lat': '$lat', 'lon': '$lon'});
 
   Future<RawWeather> fetchByCity(String city) => _fetch({'q': city});
 
@@ -56,11 +55,11 @@ class WeatherApiService {
   }
 
   Uri _uri(String path, Map<String, String> query) => Uri(
-        scheme: ApiConstants.scheme,
-        host: ApiConstants.host,
-        path: path,
-        queryParameters: query,
-      );
+    scheme: ApiConstants.scheme,
+    host: ApiConstants.host,
+    path: path,
+    queryParameters: query,
+  );
 
   Future<Map<String, dynamic>> _getJson(Uri uri) async {
     final http.Response response;

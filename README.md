@@ -18,7 +18,9 @@ dynamique), architecture propre (MVVM), gestion d'erreurs robuste et cache.
   **aucun crash** même si l'API échoue (timeout, hors-ligne, clé invalide…).
 - **Cache** (`shared_preferences`) : évite les requêtes inutiles et permet un
   repli hors-ligne (données du cache).
-- **Animations** : transition de page douce + `Hero` sur l'icône météo.
+- **Animations** : fond météo animé réactif (nuages qui dérivent, soleil le
+  jour / étoiles la nuit, pluie ou neige, éclair à l'orage) + transition
+  « container transform » (la carte du jour s'agrandit en page détail).
 
 ## Architecture (MVVM en couches)
 

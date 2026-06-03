@@ -49,10 +49,9 @@ class _CitySearchSheetState extends State<CitySearchSheet> {
         children: [
           Text(
             'Rechercher une ville',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 12),
           TextField(

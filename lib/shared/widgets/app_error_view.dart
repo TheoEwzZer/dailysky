@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 
 /// Vue d'erreur réutilisable : icône, message (en français) et bouton réessayer.
 class AppErrorView extends StatelessWidget {
-  const AppErrorView({
-    super.key,
-    required this.message,
-    required this.onRetry,
-  });
+  const AppErrorView({super.key, required this.message, required this.onRetry});
 
   final String message;
   final VoidCallback onRetry;
@@ -28,15 +24,17 @@ class AppErrorView extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               'Oups, impossible de récupérer la météo',
-              style: theme.textTheme.titleMedium
-                  ?.copyWith(fontWeight: FontWeight.w700),
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
             Text(
               message,
-              style: theme.textTheme.bodyMedium
-                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),

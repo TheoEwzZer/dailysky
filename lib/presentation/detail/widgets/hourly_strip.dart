@@ -39,15 +39,18 @@ class HourlyStrip extends StatelessWidget {
                   style: theme.textTheme.bodySmall,
                 ),
                 Icon(
-                  weatherIcon(slot.condition.kind,
-                      isNight: slot.condition.isNight),
+                  weatherIcon(
+                    slot.condition.kind,
+                    isNight: slot.condition.isNight,
+                  ),
                   color: weatherIconColor(slot.condition.kind),
                   size: 26,
                 ),
                 Text(
                   WeatherFormat.temp(slot.temp),
-                  style: theme.textTheme.titleSmall
-                      ?.copyWith(fontWeight: FontWeight.w700),
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 if (slot.pop > 0.05)
                   Text(

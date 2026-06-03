@@ -84,9 +84,15 @@ void main() {
     final completer = Completer<ForecastBundle>();
     await tester.pumpWidget(_wrap(_FakeRepository(completer)));
     completer.complete(_sampleBundle());
-    await tester.pumpAndSettle();
+    // Pas de pumpAndSettle : le fond animé (Ticker) tourne en continu et ne se
+    // « stabiliserait » jamais. On pompe quelques frames fixes à la place.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
 
     expect(find.textContaining('Prévisions sur'), findsOneWidget);
     expect(find.text('Lyon'), findsWidgets);
+
+    // Démonte l'arbre pour stopper proprement le Ticker du fond animé.
+    await tester.pumpWidget(const SizedBox());
   });
 }

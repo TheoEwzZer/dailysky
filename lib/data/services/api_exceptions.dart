@@ -14,50 +14,52 @@ sealed class WeatherException implements Exception {
 
 class MissingApiKeyException extends WeatherException {
   const MissingApiKeyException()
-      : super(
-          "Aucune clé API configurée. Renseignez votre clé OpenWeatherMap "
-          "dans env.json puis relancez l'application.",
-        );
+    : super(
+        "Aucune clé API configurée. Renseignez votre clé OpenWeatherMap "
+        "dans env.json puis relancez l'application.",
+      );
 }
 
 class InvalidApiKeyException extends WeatherException {
   const InvalidApiKeyException()
-      : super(
-          "Clé API invalide ou pas encore activée. Vérifiez votre clé "
-          "OpenWeatherMap (l'activation peut prendre jusqu'à 2 h).",
-        );
+    : super(
+        "Clé API invalide ou pas encore activée. Vérifiez votre clé "
+        "OpenWeatherMap (l'activation peut prendre jusqu'à 2 h).",
+      );
 }
 
 class LocationNotFoundException extends WeatherException {
   const LocationNotFoundException()
-      : super("Ville introuvable. Vérifiez l'orthographe et réessayez.");
+    : super("Ville introuvable. Vérifiez l'orthographe et réessayez.");
 }
 
 class RateLimitException extends WeatherException {
   const RateLimitException()
-      : super('Trop de requêtes. Patientez un instant avant de réessayer.');
+    : super('Trop de requêtes. Patientez un instant avant de réessayer.');
   @override
   bool get isTransient => true;
 }
 
 class ServerException extends WeatherException {
   const ServerException()
-      : super('Le service météo est momentanément indisponible. '
-            'Réessayez plus tard.');
+    : super(
+        'Le service météo est momentanément indisponible. '
+        'Réessayez plus tard.',
+      );
   @override
   bool get isTransient => true;
 }
 
 class NetworkException extends WeatherException {
   const NetworkException()
-      : super('Pas de connexion Internet. Vérifiez votre réseau et réessayez.');
+    : super('Pas de connexion Internet. Vérifiez votre réseau et réessayez.');
   @override
   bool get isTransient => true;
 }
 
 class RequestTimeoutException extends WeatherException {
   const RequestTimeoutException()
-      : super('La requête a expiré. Vérifiez votre connexion et réessayez.');
+    : super('La requête a expiré. Vérifiez votre connexion et réessayez.');
   @override
   bool get isTransient => true;
 }

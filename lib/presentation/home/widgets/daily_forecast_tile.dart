@@ -1,6 +1,6 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 
-import '../../../core/routing/fade_through_route.dart';
 import '../../../core/utils/date_formatting.dart';
 import '../../../core/utils/weather_format.dart';
 import '../../../core/utils/weather_icon_mapper.dart';
@@ -8,17 +8,16 @@ import '../../../data/models/daily_forecast.dart';
 import '../../detail/detail_screen.dart';
 
 /// Une ligne de la liste : un jour avec son icône, sa condition et ses min/max.
-/// Tape -> écran de détail (transition douce + animation Hero sur l'icône).
+/// Tape → écran de détail via une transition « container transform » : la carte
+/// s'agrandit/morphe en page détail (package `animations`).
 class DailyForecastTile extends StatelessWidget {
   const DailyForecastTile({
     super.key,
     required this.day,
-    required this.heroTag,
     required this.cityName,
   });
 
   final DailyForecast day;
-  final String heroTag;
   final String cityName;
 
   @override
@@ -26,16 +25,22 @@ class DailyForecastTile extends StatelessWidget {
     final theme = Theme.of(context);
     final muted = theme.colorScheme.onSurfaceVariant;
 
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-      child: InkWell(
-        onTap: () => Navigator.of(context).push(
-          FadeThroughPageRoute<void>(
-            builder: (_) =>
-                DetailScreen(day: day, heroTag: heroTag, cityName: cityName),
-          ),
+    // Réglages choisis pour conserver exactement le look de la carte d'origine
+    // (même couleur, même rayon, même élévation, même marge).
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+      child: OpenContainer(
+        tappable: true,
+        closedElevation: 0,
+        closedColor: theme.colorScheme.surfaceContainerHigh,
+        openColor: theme.colorScheme.surface,
+        closedShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
         ),
-        child: Padding(
+        transitionType: ContainerTransitionType.fadeThrough,
+        transitionDuration: const Duration(milliseconds: 420),
+        openBuilder: (context, _) => DetailScreen(day: day, cityName: cityName),
+        closedBuilder: (context, openContainer) => Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
             children: [
@@ -60,13 +65,10 @@ class DailyForecastTile extends StatelessWidget {
                   ],
                 ),
               ),
-              Hero(
-                tag: heroTag,
-                child: Icon(
-                  weatherIcon(day.kind, isNight: day.condition.isNight),
-                  color: weatherIconColor(day.kind),
-                  size: 30,
-                ),
+              Icon(
+                weatherIcon(day.kind, isNight: day.condition.isNight),
+                color: weatherIconColor(day.kind),
+                size: 30,
               ),
               const SizedBox(width: 12),
               Expanded(

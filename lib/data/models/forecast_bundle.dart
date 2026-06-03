@@ -65,8 +65,12 @@ class ForecastBundle {
 
     final entries = rawList
         .whereType<Map<String, dynamic>>()
-        .map((e) =>
-            ForecastEntry.fromForecastJson(e, timezoneOffsetSeconds: timezone))
+        .map(
+          (e) => ForecastEntry.fromForecastJson(
+            e,
+            timezoneOffsetSeconds: timezone,
+          ),
+        )
         .toList();
 
     return ForecastBundle(
