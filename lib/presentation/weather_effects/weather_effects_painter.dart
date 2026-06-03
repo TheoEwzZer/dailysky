@@ -71,7 +71,7 @@ class WeatherEffectsPainter extends CustomPainter {
       final scale = 0.6 + rnd.nextDouble() * 0.9;
       final cloudW = size.width * 0.5 * scale;
       final y = size.height * (0.12 + rnd.nextDouble() * 0.5);
-      final span = size.width + cloudW;
+      final span = size.width + cloudW * 2.0;
       final baseX = rnd.nextDouble() * span;
       final x = ((baseX + t * speed) % span) - cloudW;
       paint.color = Colors.white.withValues(
