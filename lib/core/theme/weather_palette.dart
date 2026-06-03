@@ -37,6 +37,26 @@ class WeatherPalette {
     }
   }
 
+  /// Dégradé plein écran « immersif » : thème clair (« Ciel vivant ») le jour,
+  /// thème sombre (« Aurora glass ») la nuit, légèrement teinté par la météo.
+  static List<Color> immersive(WeatherKind kind, {required bool isNight}) {
+    if (isNight) {
+      return const [Color(0xFF070B22), Color(0xFF161B44), Color(0xFF2C2155)];
+    }
+    switch (kind) {
+      case WeatherKind.rain:
+      case WeatherKind.drizzle:
+      case WeatherKind.thunderstorm:
+        return const [Color(0xFF35506B), Color(0xFF5C7E9B), Color(0xFF87A4BD)];
+      case WeatherKind.snow:
+        return const [Color(0xFF4E73A8), Color(0xFF82A8D4), Color(0xFFB8D4ED)];
+      case WeatherKind.clear:
+      case WeatherKind.clouds:
+      case WeatherKind.atmosphere:
+        return const [Color(0xFF2E6FBF), Color(0xFF5E97D4), Color(0xFF93BEE8)];
+    }
+  }
+
   static const _clearDay = WeatherPalette(
     gradient: [Color(0xFF1E6FE0), Color(0xFF59A5FF)],
     accent: Color(0xFFFFD54F),

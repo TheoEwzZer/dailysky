@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/weather_palette.dart';
 import '../../../core/utils/weather_format.dart';
 import '../../../core/utils/weather_icon_mapper.dart';
 import '../../../core/weather/weather_kind.dart';
 import '../../../data/models/forecast_bundle.dart';
-import '../../weather_effects/weather_effects_layer.dart';
+import '../../widgets/glass_card.dart';
 
-/// En-tête « héros » : dégradé dont les couleurs dépendent de la météo
-/// (et du jour/nuit), avec la ville, la température et un récapitulatif.
+/// En-tête immersif : ville, grande icône, grande température, condition et une
+/// carte « verre » récapitulative (ressenti / humidité / vent). Transparent —
+/// le dégradé plein écran et les effets animés sont gérés par l'écran.
 class WeatherHeroHeader extends StatelessWidget {
   const WeatherHeroHeader({
     super.key,
@@ -28,7 +28,6 @@ class WeatherHeroHeader extends StatelessWidget {
     final condition = current?.condition ?? firstDay?.condition;
     final kind = condition?.kind ?? WeatherKind.clear;
     final isNight = condition?.isNight ?? false;
-    final palette = WeatherPalette.of(kind, isNight: isNight);
 
     final temp = current?.temp ?? firstDay?.tempMax;
     final feelsLike = current?.feelsLike ?? firstDay?.feelsLike;
@@ -38,133 +37,95 @@ class WeatherHeroHeader extends StatelessWidget {
         ? bundle.cityName
         : (current?.cityName ?? 'Position actuelle');
 
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: palette.primary.withValues(alpha: 0.35),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(28),
-        child: Stack(
-          children: [
-            // Dégradé d'origine (design inchangé).
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: palette.gradient,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.location_on, color: Colors.white, size: 22),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  city,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 26,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
-            ),
-            // Effets météo animés, derrière le contenu.
-            Positioned.fill(
-              child: WeatherEffectsLayer(kind: kind, isNight: isNight),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 12, 22),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.location_on,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          city,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: onMyLocation,
-                        icon: const Icon(Icons.my_location_rounded),
-                        color: Colors.white,
-                        tooltip: 'Utiliser ma position',
-                      ),
-                      IconButton(
-                        onPressed: onSearch,
-                        icon: const Icon(Icons.search_rounded),
-                        color: Colors.white,
-                        tooltip: 'Rechercher une ville',
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Icon(
-                    weatherIcon(kind, isNight: isNight),
-                    size: 92,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    temp != null ? WeatherFormat.temp(temp) : '—',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 68,
-                      fontWeight: FontWeight.w300,
-                      height: 1,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    condition?.label ?? '',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.92),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      _HeroStat(
-                        icon: Icons.thermostat_rounded,
-                        label: 'Ressenti',
-                        value: feelsLike != null
-                            ? WeatherFormat.temp(feelsLike)
-                            : '—',
-                      ),
-                      _divider,
-                      _HeroStat(
-                        icon: Icons.water_drop_rounded,
-                        label: 'Humidité',
-                        value: humidity != null
-                            ? WeatherFormat.humidity(humidity)
-                            : '—',
-                      ),
-                      _divider,
-                      _HeroStat(
-                        icon: Icons.air_rounded,
-                        label: 'Vent',
-                        value: wind != null ? WeatherFormat.wind(wind) : '—',
-                      ),
-                    ],
-                  ),
-                ],
+              _GlassIconButton(
+                icon: Icons.my_location_rounded,
+                tooltip: 'Utiliser ma position',
+                onPressed: onMyLocation,
               ),
+              const SizedBox(width: 10),
+              _GlassIconButton(
+                icon: Icons.search_rounded,
+                tooltip: 'Rechercher une ville',
+                onPressed: onSearch,
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Icon(
+            weatherIcon(kind, isNight: isNight),
+            size: 104,
+            color: Colors.white,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            temp != null ? WeatherFormat.temp(temp) : '—',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 92,
+              fontWeight: FontWeight.w200,
+              height: 1,
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            condition?.label ?? '',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 22),
+          GlassCard(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Row(
+              children: [
+                _HeroStat(
+                  icon: Icons.thermostat_rounded,
+                  label: 'Ressenti',
+                  value: feelsLike != null
+                      ? WeatherFormat.temp(feelsLike)
+                      : '—',
+                ),
+                _divider,
+                _HeroStat(
+                  icon: Icons.water_drop_rounded,
+                  label: 'Humidité',
+                  value: humidity != null
+                      ? WeatherFormat.humidity(humidity)
+                      : '—',
+                ),
+                _divider,
+                _HeroStat(
+                  icon: Icons.air_rounded,
+                  label: 'Vent',
+                  value: wind != null ? WeatherFormat.wind(wind) : '—',
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -173,6 +134,33 @@ class WeatherHeroHeader extends StatelessWidget {
     height: 34,
     child: VerticalDivider(color: Colors.white24, width: 1),
   );
+}
+
+class _GlassIconButton extends StatelessWidget {
+  const _GlassIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white.withValues(alpha: 0.18),
+      shape: const CircleBorder(),
+      clipBehavior: Clip.antiAlias,
+      child: IconButton(
+        onPressed: onPressed,
+        icon: Icon(icon, color: Colors.white, size: 20),
+        tooltip: tooltip,
+        visualDensity: VisualDensity.compact,
+      ),
+    );
+  }
 }
 
 class _HeroStat extends StatelessWidget {

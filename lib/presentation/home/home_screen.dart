@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import '../../core/theme/weather_palette.dart';
+import '../../core/weather/weather_kind.dart';
 import '../../data/models/forecast_bundle.dart';
 import '../../shared/widgets/app_error_view.dart';
 import '../../shared/widgets/app_loading_view.dart';
 import '../state/view_state.dart';
+import '../weather_effects/weather_effects_layer.dart';
 import 'home_view_model.dart';
 import 'widgets/city_search_sheet.dart';
 import 'widgets/daily_forecast_tile.dart';
 import 'widgets/weather_hero_header.dart';
 
-/// Écran principal : liste des jours. Délègue toute la logique au ViewModel et
-/// se contente d'afficher l'état courant (chargement / erreur / succès).
+/// Écran principal immersif : fond météo plein écran + liste des jours.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -27,7 +30,6 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<HomeViewModel>();
 
-    // Erreur transitoire (échec d'un rafraîchissement) : SnackBar one-shot.
     final transientError = viewModel.transientError;
     if (transientError != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -74,53 +76,80 @@ class _SuccessView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return SafeArea(
-      bottom: false,
-      child: RefreshIndicator(
-        onRefresh: onRefresh,
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: 24),
-          children: [
-            WeatherHeroHeader(
-              bundle: bundle,
-              onSearch: onSearch,
-              onMyLocation: onMyLocation,
-            ),
-            if (bundle.source == ForecastSource.defaultCity)
-              _InfoBanner(
-                icon: Icons.location_off_rounded,
-                text:
-                    'Localisation indisponible — météo de la ville par '
-                    'défaut (${bundle.cityName}).',
-              ),
-            if (bundle.isStale)
-              const _InfoBanner(
-                icon: Icons.cloud_off_rounded,
-                text: 'Hors-ligne : données possiblement périmées (cache).',
-              ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-              child: Text(
-                'Prévisions sur ${bundle.daily.length} jours',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
+    final condition =
+        bundle.current?.condition ??
+        (bundle.daily.isNotEmpty ? bundle.daily.first.condition : null);
+    final kind = condition?.kind ?? WeatherKind.clear;
+    final isNight = condition?.isNight ?? false;
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: WeatherPalette.immersive(kind, isNight: isNight),
                 ),
               ),
             ),
-            for (final day in bundle.daily)
-              DailyForecastTile(day: day, cityName: bundle.cityName),
-            const SizedBox(height: 10),
-            Center(
-              child: Text(
-                'Données fournies par OpenWeatherMap',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
+          ),
+          Positioned.fill(
+            child: WeatherEffectsLayer(kind: kind, isNight: isNight),
+          ),
+          RefreshIndicator(
+            onRefresh: onRefresh,
+            child: SafeArea(
+              bottom: false,
+              child: ListView(
+                padding: const EdgeInsets.only(top: 8, bottom: 28),
+                children: [
+                  WeatherHeroHeader(
+                    bundle: bundle,
+                    onSearch: onSearch,
+                    onMyLocation: onMyLocation,
+                  ),
+                  if (bundle.source == ForecastSource.defaultCity)
+                    const _InfoBanner(
+                      icon: Icons.location_off_rounded,
+                      text: 'Localisation indisponible — ville par défaut.',
+                    ),
+                  if (bundle.isStale)
+                    const _InfoBanner(
+                      icon: Icons.cloud_off_rounded,
+                      text: 'Hors-ligne : données possiblement périmées.',
+                    ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                    child: Text(
+                      'Prévisions sur ${bundle.daily.length} jours',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  for (final day in bundle.daily)
+                    DailyForecastTile(day: day, cityName: bundle.cityName),
+                  const SizedBox(height: 12),
+                  Center(
+                    child: Text(
+                      'Données fournies par OpenWeatherMap',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.7),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -134,25 +163,23 @@ class _InfoBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: theme.colorScheme.secondaryContainer,
+          color: Colors.white.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 18, color: theme.colorScheme.onSecondaryContainer),
+            Icon(icon, size: 18, color: Colors.white),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
                 text,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSecondaryContainer,
-                ),
+                style: const TextStyle(color: Colors.white, fontSize: 13),
               ),
             ),
           ],

@@ -6,10 +6,10 @@ import '../../../core/utils/weather_format.dart';
 import '../../../core/utils/weather_icon_mapper.dart';
 import '../../../data/models/daily_forecast.dart';
 import '../../detail/detail_screen.dart';
+import '../../widgets/glass_card.dart';
 
-/// Une ligne de la liste : un jour avec son icône, sa condition et ses min/max.
-/// Tape → écran de détail via une transition « container transform » : la carte
-/// s'agrandit/morphe en page détail (package `animations`).
+/// Ligne de prévision en carte « verre ». Tape → détail via « container
+/// transform » (la carte s'agrandit en page détail).
 class DailyForecastTile extends StatelessWidget {
   const DailyForecastTile({
     super.key,
@@ -22,30 +22,29 @@ class DailyForecastTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final muted = theme.colorScheme.onSurfaceVariant;
+    const white70 = Color(0xB3FFFFFF);
 
-    // Réglages choisis pour conserver exactement le look de la carte d'origine
-    // (même couleur, même rayon, même élévation, même marge).
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
       child: OpenContainer(
-        tappable: true,
+        tappable: false,
         closedElevation: 0,
-        closedColor: theme.colorScheme.surfaceContainerHigh,
-        openColor: theme.colorScheme.surface,
-        closedShape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+        closedColor: Colors.transparent,
+        openColor: Colors.transparent,
+        closedShape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20)),
         ),
         transitionType: ContainerTransitionType.fadeThrough,
         transitionDuration: const Duration(milliseconds: 420),
         openBuilder: (context, _) => DetailScreen(day: day, cityName: cityName),
-        closedBuilder: (context, openContainer) => Padding(
+        closedBuilder: (context, openContainer) => GlassCard(
+          borderRadius: 20,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          onTap: openContainer,
           child: Row(
             children: [
               SizedBox(
-                width: 88,
+                width: 92,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -53,22 +52,24 @@ class DailyForecastTile extends StatelessWidget {
                       DateFormatting.relativeWeekday(day.date),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.titleMedium?.copyWith(
+                      style: const TextStyle(
+                        color: Colors.white,
                         fontWeight: FontWeight.w700,
+                        fontSize: 15,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       DateFormatting.dayMonth(day.date),
-                      style: theme.textTheme.bodySmall?.copyWith(color: muted),
+                      style: const TextStyle(color: white70, fontSize: 12),
                     ),
                   ],
                 ),
               ),
               Icon(
                 weatherIcon(day.kind, isNight: day.condition.isNight),
-                color: weatherIconColor(day.kind),
-                size: 30,
+                color: Colors.white,
+                size: 28,
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -79,26 +80,14 @@ class DailyForecastTile extends StatelessWidget {
                       day.condition.label,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyMedium,
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
                     ),
                     if (day.pop > 0.05)
                       Padding(
                         padding: const EdgeInsets.only(top: 2),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.water_drop_rounded,
-                              size: 13,
-                              color: weatherIconColor(day.kind),
-                            ),
-                            const SizedBox(width: 3),
-                            Text(
-                              WeatherFormat.precipitation(day.pop),
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: muted,
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          '${WeatherFormat.precipitation(day.pop)} pluie',
+                          style: const TextStyle(color: white70, fontSize: 12),
                         ),
                       ),
                   ],
@@ -107,16 +96,18 @@ class DailyForecastTile extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 WeatherFormat.temp(day.tempMax),
-                style: theme.textTheme.titleMedium?.copyWith(
+                style: const TextStyle(
+                  color: Colors.white,
                   fontWeight: FontWeight.w700,
+                  fontSize: 16,
                 ),
               ),
               const SizedBox(width: 6),
               Text(
                 WeatherFormat.temp(day.tempMin),
-                style: theme.textTheme.titleMedium?.copyWith(color: muted),
+                style: const TextStyle(color: white70, fontSize: 16),
               ),
-              Icon(Icons.chevron_right_rounded, color: muted),
+              const Icon(Icons.chevron_right_rounded, color: white70),
             ],
           ),
         ),
