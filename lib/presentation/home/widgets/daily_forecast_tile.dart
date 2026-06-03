@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 
 import '../../../core/utils/date_formatting.dart';
 import '../../../core/utils/weather_format.dart';
-import '../../../core/utils/weather_icon_mapper.dart';
 import '../../../data/models/daily_forecast.dart';
 import '../../detail/detail_screen.dart';
 import '../../widgets/glass_card.dart';
+import '../../widgets/weather_glyph.dart';
 
 /// Ligne de prévision en carte « verre ». Tape → détail via « container
 /// transform » (la carte s'agrandit en page détail).
@@ -66,10 +66,11 @@ class DailyForecastTile extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
-                weatherIcon(day.kind, isNight: day.condition.isNight),
-                color: Colors.white,
-                size: 28,
+              WeatherGlyph(
+                iconCode: day.condition.iconCode,
+                kind: day.kind,
+                isNight: day.condition.isNight,
+                size: 42,
               ),
               const SizedBox(width: 12),
               Expanded(

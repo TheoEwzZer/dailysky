@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../../../core/utils/date_formatting.dart';
 import '../../../core/utils/weather_format.dart';
-import '../../../core/utils/weather_icon_mapper.dart';
 import '../../../data/models/forecast_entry.dart';
 import '../../widgets/glass_card.dart';
+import '../../widgets/weather_glyph.dart';
 
 /// Bande horizontale des créneaux de 3 h, en cartes « verre ».
 class HourlyStrip extends StatelessWidget {
@@ -38,13 +38,11 @@ class HourlyStrip extends StatelessWidget {
                       fontSize: 12,
                     ),
                   ),
-                  Icon(
-                    weatherIcon(
-                      slot.condition.kind,
-                      isNight: slot.condition.isNight,
-                    ),
-                    color: Colors.white,
-                    size: 26,
+                  WeatherGlyph(
+                    iconCode: slot.condition.iconCode,
+                    kind: slot.condition.kind,
+                    isNight: slot.condition.isNight,
+                    size: 40,
                   ),
                   Text(
                     WeatherFormat.temp(slot.temp),

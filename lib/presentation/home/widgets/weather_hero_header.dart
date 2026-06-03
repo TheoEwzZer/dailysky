@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/utils/weather_format.dart';
-import '../../../core/utils/weather_icon_mapper.dart';
 import '../../../core/weather/weather_kind.dart';
 import '../../../data/models/forecast_bundle.dart';
 import '../../widgets/glass_card.dart';
+import '../../widgets/weather_glyph.dart';
 
 /// En-tête immersif : ville, grande icône, grande température, condition et une
 /// carte « verre » récapitulative (ressenti / humidité / vent). Transparent —
@@ -71,10 +71,11 @@ class WeatherHeroHeader extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 18),
-          Icon(
-            weatherIcon(kind, isNight: isNight),
-            size: 104,
-            color: Colors.white,
+          WeatherGlyph(
+            iconCode: condition?.iconCode ?? '01d',
+            kind: kind,
+            isNight: isNight,
+            size: 120,
           ),
           const SizedBox(height: 8),
           Text(

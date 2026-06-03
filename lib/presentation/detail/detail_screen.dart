@@ -4,9 +4,9 @@ import 'package:flutter/services.dart';
 import '../../core/theme/weather_palette.dart';
 import '../../core/utils/date_formatting.dart';
 import '../../core/utils/weather_format.dart';
-import '../../core/utils/weather_icon_mapper.dart';
 import '../../data/models/daily_forecast.dart';
 import '../weather_effects/weather_effects_layer.dart';
+import '../widgets/weather_glyph.dart';
 import 'widgets/hourly_strip.dart';
 import 'widgets/metric_card.dart';
 
@@ -57,10 +57,11 @@ class DetailScreen extends StatelessWidget {
                 ),
                 children: [
                   Center(
-                    child: Icon(
-                      weatherIcon(kind, isNight: isNight),
-                      color: Colors.white,
-                      size: 104,
+                    child: WeatherGlyph(
+                      iconCode: day.condition.iconCode,
+                      kind: kind,
+                      isNight: isNight,
+                      size: 128,
                     ),
                   ),
                   const SizedBox(height: 16),

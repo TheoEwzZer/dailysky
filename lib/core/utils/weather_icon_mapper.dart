@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../weather/weather_kind.dart';
 
+/// URL de l'icône météo officielle OpenWeatherMap (PNG couleur) pour un code
+/// d'icône (ex. « 10d », « 01n »). `@4x` = 200×200 px (net une fois réduit).
+String owmIconUrl(String iconCode) =>
+    'https://openweathermap.org/img/wn/$iconCode@4x.png';
+
 /// Convertit une condition météo en icône Material (aucun asset, fonctionne
 /// hors-ligne). Le paramètre [isNight] permet de distinguer jour et nuit pour
 /// les conditions « dégagé » et « nuageux ».
