@@ -4,8 +4,10 @@ Application météo Flutter affichant les prévisions sur 5 jours avec un écran
 
 ## Captures d'écran
 
-![DailySky](docs/screenshots/DailySky.jpg)
-![DailySky Detail](docs/screenshots/DailySky2.jpg)
+<p align="center">
+  <img src="docs/screenshots/DailySky.jpg" width="300" alt="DailySky">
+  <img src="docs/screenshots/DailySky2.jpg" width="300" alt="DailySky Detail">
+</p>
 
 ## Principales fonctionnalités
 
