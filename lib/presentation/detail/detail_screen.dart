@@ -51,10 +51,7 @@ class DetailScreen extends StatelessWidget {
             ),
             SafeArea(
               child: ListView(
-                padding: const EdgeInsets.only(
-                  top: kToolbarHeight + 8,
-                  bottom: 28,
-                ),
+                padding: const EdgeInsets.only(top: 0, bottom: 28),
                 children: [
                   Center(
                     child: WeatherGlyph(
