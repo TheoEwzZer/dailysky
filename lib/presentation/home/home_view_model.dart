@@ -25,9 +25,45 @@ class HomeViewModel extends ChangeNotifier {
   Future<void> load() => _run(_repository.loadForCurrentLocation);
 
   /// Recherche d'une ville saisie par l'utilisateur.
-  Future<void> searchCity(String city) {
-    if (city.trim().isEmpty) return Future<void>.value();
-    return _run(() => _repository.loadForCity(city));
+  ///
+  /// Retourne `null` en cas de succès, ou un message d'erreur en cas d'échec.
+  /// Si des données sont déjà affichées, l'état précédent est préservé
+  /// (pas de plein écran d'erreur). La feuille de recherche utilise la valeur
+  /// de retour pour afficher l'erreur inline.
+  Future<String?> searchCity(String city) async {
+    if (city.trim().isEmpty) return null;
+
+    final previousState = _state;
+
+    // Pas de LoadingState plein écran si on a déjà des données — la feuille
+    // de recherche affiche son propre indicateur de chargement.
+    if (previousState is! SuccessState<ForecastBundle>) {
+      _state = const LoadingState();
+      notifyListeners();
+    }
+
+    try {
+      _state = SuccessState(await _repository.loadForCity(city));
+      notifyListeners();
+      return null;
+    } on WeatherException catch (e) {
+      if (previousState is SuccessState<ForecastBundle>) {
+        _state = previousState;
+      } else {
+        _state = FailureState(e.message);
+      }
+      notifyListeners();
+      return e.message;
+    } catch (_) {
+      const msg = 'Une erreur inattendue est survenue.';
+      if (previousState is SuccessState<ForecastBundle>) {
+        _state = previousState;
+      } else {
+        _state = const FailureState(msg);
+      }
+      notifyListeners();
+      return msg;
+    }
   }
 
   /// Réessai depuis un état d'erreur.

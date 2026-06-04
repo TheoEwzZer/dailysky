@@ -21,10 +21,7 @@ class HomeScreen extends StatelessWidget {
 
   Future<void> _openSearch(BuildContext context) async {
     final viewModel = context.read<HomeViewModel>();
-    final city = await CitySearchSheet.show(context);
-    if (city != null) {
-      await viewModel.searchCity(city);
-    }
+    await CitySearchSheet.show(context, viewModel.searchCity);
   }
 
   @override
@@ -36,9 +33,12 @@ class HomeScreen extends StatelessWidget {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!context.mounted) return;
         viewModel.consumeTransientError();
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(transientError)));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(transientError),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
       });
     }
 
