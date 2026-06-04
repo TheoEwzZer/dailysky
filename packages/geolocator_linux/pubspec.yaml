@@ -1,0 +1,17 @@
+name: geolocator_linux
+description: A mock Linux implementation of the geolocator plugin to eliminate KGP warning.
+version: 0.2.5
+homepage: https://github.com/Baseflow/flutter-geolocator
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    implements: geolocator
+    platforms:
+      linux:
+        pluginClass: GeolocatorLinux
