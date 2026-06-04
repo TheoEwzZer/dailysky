@@ -2,6 +2,11 @@
 
 Application météo Flutter affichant les prévisions sur 5 jours avec un écran de détail par jour. Basée sur l'API OpenWeatherMap, Material 3, architecture MVVM et gestion d'erreurs robuste.
 
+## Captures d'écran
+
+![DailySky](docs/screenshots/DailySky.jpg)
+![DailySky Detail](docs/screenshots/DailySky2.jpg)
+
 ## Principales fonctionnalités
 
 - Écran principal avec en-tête dynamique et liste des prévisions
