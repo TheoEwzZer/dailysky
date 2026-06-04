@@ -166,7 +166,8 @@ class _SuccessView extends StatelessWidget {
       case GpsErrorType.serviceDisabled:
         return _InfoBanner(
           icon: Icons.gps_off_rounded,
-          text: 'Le GPS de votre appareil est désactivé. Activez-le pour obtenir la météo locale.',
+          text:
+              'Le GPS de votre appareil est désactivé. Activez-le pour obtenir la météo locale.',
           accentColor: accent,
           actionLabel: 'Activer',
           onAction: () async {
@@ -176,7 +177,8 @@ class _SuccessView extends StatelessWidget {
       case GpsErrorType.permissionDenied:
         return _InfoBanner(
           icon: Icons.location_off_rounded,
-          text: "L'accès à la position a été refusé. Autorisez-le pour afficher la météo locale.",
+          text:
+              "L'accès à la position a été refusé. Autorisez-le pour afficher la météo locale.",
           accentColor: accent,
           actionLabel: 'Autoriser',
           onAction: onMyLocation,
@@ -184,7 +186,8 @@ class _SuccessView extends StatelessWidget {
       case GpsErrorType.permissionDeniedForever:
         return _InfoBanner(
           icon: Icons.gpp_bad_rounded,
-          text: "L'accès à la position est bloqué. Activez-le dans les paramètres.",
+          text:
+              "L'accès à la position est bloqué. Activez-le dans les paramètres.",
           accentColor: accent,
           actionLabel: 'Paramètres',
           onAction: () async {
@@ -212,7 +215,9 @@ class _InfoBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final borderCol = accentColor?.withValues(alpha: 0.4) ?? Colors.white.withValues(alpha: 0.22);
+    final borderCol =
+        accentColor?.withValues(alpha: 0.4) ??
+        Colors.white.withValues(alpha: 0.22);
     final iconCol = accentColor ?? Colors.white;
 
     return Padding(
@@ -238,20 +243,32 @@ class _InfoBanner extends StatelessWidget {
               const SizedBox(width: 10),
               TextButton(
                 style: TextButton.styleFrom(
-                  backgroundColor: accentColor?.withValues(alpha: 0.15) ?? Colors.white.withValues(alpha: 0.1),
+                  backgroundColor:
+                      accentColor?.withValues(alpha: 0.15) ??
+                      Colors.white.withValues(alpha: 0.1),
                   foregroundColor: accentColor ?? Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
-                  side: BorderSide(color: accentColor?.withValues(alpha: 0.3) ?? Colors.white.withValues(alpha: 0.2)),
+                    side: BorderSide(
+                      color:
+                          accentColor?.withValues(alpha: 0.3) ??
+                          Colors.white.withValues(alpha: 0.2),
+                    ),
                   ),
                 ),
                 onPressed: onAction,
                 child: Text(
                   actionLabel!,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
                 ),
               ),
             ],

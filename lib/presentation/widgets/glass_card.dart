@@ -57,7 +57,8 @@ class _GlassCardState extends State<GlassCard> {
     final route = _route;
     if (route == null) return;
 
-    final isTransitioning = route.animation?.isAnimating == true ||
+    final isTransitioning =
+        route.animation?.isAnimating == true ||
         route.secondaryAnimation?.isAnimating == true;
     if (isTransitioning != _isTransitioning) {
       setState(() {
@@ -93,10 +94,7 @@ class _GlassCardState extends State<GlassCard> {
     );
 
     if (_isTransitioning) {
-      return ClipRRect(
-        borderRadius: radius,
-        child: cardContent,
-      );
+      return ClipRRect(borderRadius: radius, child: cardContent);
     }
 
     return ClipRRect(

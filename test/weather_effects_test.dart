@@ -26,7 +26,11 @@ void main() {
         // Deux frames : la première (~16 ms) tombe dans la fenêtre d'éclair.
         await tester.pump(const Duration(milliseconds: 16));
         await tester.pump(const Duration(milliseconds: 200));
-        expect(tester.takeException(), isNull, reason: '$kind (night=$isNight)');
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: '$kind (night=$isNight)',
+        );
       }
     }
     // Démonte l'arbre pour disposer proprement le Ticker.

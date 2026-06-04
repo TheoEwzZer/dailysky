@@ -77,10 +77,7 @@ void main() {
     final result = await vm.searchCity('Tokyo');
     expect(result, isNull);
     expect(vm.state, isA<SuccessState<ForecastBundle>>());
-    expect(
-      (vm.state as SuccessState<ForecastBundle>).data.cityName,
-      'Tokyo',
-    );
+    expect((vm.state as SuccessState<ForecastBundle>).data.cityName, 'Tokyo');
   });
 
   test(
@@ -105,10 +102,7 @@ void main() {
 
       // L'état reste SuccessState avec les données précédentes
       expect(vm.state, isA<SuccessState<ForecastBundle>>());
-      expect(
-        (vm.state as SuccessState<ForecastBundle>).data.cityName,
-        'Lyon',
-      );
+      expect((vm.state as SuccessState<ForecastBundle>).data.cityName, 'Lyon');
     },
   );
 

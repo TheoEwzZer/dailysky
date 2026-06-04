@@ -83,7 +83,8 @@ class _WeatherEffectsLayerState extends State<WeatherEffectsLayer>
     }
 
     final route = _route;
-    final isTransitioning = route?.animation?.isAnimating == true ||
+    final isTransitioning =
+        route?.animation?.isAnimating == true ||
         route?.secondaryAnimation?.isAnimating == true;
     final isCurrent = route?.isCurrent ?? true;
     final shouldRun = isCurrent && !isTransitioning;

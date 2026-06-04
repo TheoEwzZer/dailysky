@@ -10,7 +10,7 @@ import '../../core/weather/weather_kind.dart';
 ///
 /// Le rendu dépend de la condition météo et du moment de la journée ; il est
 /// piloté en continu par [time] (secondes écoulées). Les positions des
-/// particules sont générées avec un [math.Random] à graine fixe → stables d'une
+/// particules sont générées avec un [math.Random] à graine fixe -> stables d'une
 /// frame à l'autre, seul le temps les fait évoluer.
 class WeatherEffectsPainter extends CustomPainter {
   WeatherEffectsPainter({

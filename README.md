@@ -16,7 +16,7 @@ Application météo Flutter affichant les prévisions sur 5 jours avec un écran
 
 1. **Flutter 3.44+** requis. Vérifiez avec `flutter doctor`.
 2. **Clé API OpenWeatherMap** (gratuite) : créez un compte sur [openweathermap.org](https://home.openweathermap.org/users/sign_up)
-3. Configurez la clé en copiant `env.example.json` → `env.json` et ajoutez votre clé :
+3. Configurez la clé en copiant `env.example.json` -> `env.json` et ajoutez votre clé :
 
 ```json
 {

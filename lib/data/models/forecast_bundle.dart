@@ -7,11 +7,7 @@ import 'forecast_entry.dart';
 enum ForecastSource { gps, defaultCity, search }
 
 /// Type d'erreur GPS pour afficher une bannière explicative.
-enum GpsErrorType {
-  serviceDisabled,
-  permissionDenied,
-  permissionDeniedForever,
-}
+enum GpsErrorType { serviceDisabled, permissionDenied, permissionDeniedForever }
 
 /// Données météo complètes prêtes pour l'affichage : météo actuelle (en-tête)
 /// + prévisions journalières (liste).
@@ -50,19 +46,18 @@ class ForecastBundle {
     ForecastSource? source,
     bool? isStale,
     GpsErrorType? gpsError,
-  }) =>
-      ForecastBundle(
-        cityName: cityName,
-        latitude: latitude,
-        longitude: longitude,
-        timezoneOffsetSeconds: timezoneOffsetSeconds,
-        current: current,
-        daily: daily,
-        source: source ?? this.source,
-        fetchedAt: fetchedAt,
-        isStale: isStale ?? this.isStale,
-        gpsError: gpsError ?? this.gpsError,
-      );
+  }) => ForecastBundle(
+    cityName: cityName,
+    latitude: latitude,
+    longitude: longitude,
+    timezoneOffsetSeconds: timezoneOffsetSeconds,
+    current: current,
+    daily: daily,
+    source: source ?? this.source,
+    fetchedAt: fetchedAt,
+    isStale: isStale ?? this.isStale,
+    gpsError: gpsError ?? this.gpsError,
+  );
 
   /// Construit le bundle à partir des réponses brutes de l'API et regroupe les
   /// créneaux de 3 h en prévisions journalières. C'est ici que vit la logique

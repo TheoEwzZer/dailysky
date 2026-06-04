@@ -5,7 +5,7 @@ import '../../core/weather/weather_kind.dart';
 
 /// Affiche l'icône météo officielle OpenWeatherMap (PNG couleur), avec **repli
 /// automatique** sur l'icône Material (blanche) en cas d'erreur réseau ou
-/// pendant le chargement → aucun écran vide, fonctionne hors-ligne.
+/// pendant le chargement -> aucun écran vide, fonctionne hors-ligne.
 class WeatherGlyph extends StatelessWidget {
   const WeatherGlyph({
     super.key,

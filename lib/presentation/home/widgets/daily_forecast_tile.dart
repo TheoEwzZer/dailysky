@@ -8,7 +8,7 @@ import '../../detail/detail_screen.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/weather_glyph.dart';
 
-/// Ligne de prévision en carte « verre ». Tape → détail via « container
+/// Ligne de prévision en carte « verre ». Tape -> détail via « container
 /// transform » (la carte s'agrandit en page détail).
 class DailyForecastTile extends StatelessWidget {
   const DailyForecastTile({
