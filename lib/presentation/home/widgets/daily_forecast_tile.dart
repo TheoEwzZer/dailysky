@@ -95,18 +95,23 @@ class DailyForecastTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Text(
-                WeatherFormat.temp(day.tempMax),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(width: 6),
-              Text(
-                WeatherFormat.temp(day.tempMin),
-                style: const TextStyle(color: white70, fontSize: 16),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    WeatherFormat.temp(day.tempMax),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    WeatherFormat.temp(day.tempMin),
+                    style: const TextStyle(color: white70, fontSize: 16),
+                  ),
+                ],
               ),
               const Icon(Icons.chevron_right_rounded, color: white70),
             ],
