@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../config/app_config.dart';
@@ -45,12 +46,13 @@ class LocationService {
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.medium,
-          timeLimit: AppConfig.networkTimeout,
+          timeLimit: AppConfig.gpsTimeout,
         ),
       );
       return Coords(position.latitude, position.longitude);
-    } catch (_) {
+    } catch (e) {
       // Timeout, service coupé en route, plateforme non supportée…
+      debugPrint('[LocationService] GPS fix échoué : $e');
       return null;
     }
   }

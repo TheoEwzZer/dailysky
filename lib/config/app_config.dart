@@ -29,4 +29,8 @@ class AppConfig {
 
   /// Délai maximal accordé à un appel réseau avant abandon.
   static const Duration networkTimeout = Duration(seconds: 10);
+
+  /// Délai maximal pour obtenir un fix GPS. Plus long que le timeout réseau
+  /// car le premier fix peut prendre du temps, surtout en intérieur.
+  static const Duration gpsTimeout = Duration(seconds: 20);
 }
